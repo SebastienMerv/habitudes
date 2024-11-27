@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "habitudes",
+    "name": "Habitudes Manage",
     "slug": "habitudes",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.sebastienmerv.habitudes"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +37,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d1d8fad1-2fde-4935-902e-b61e554d8691"
+      }
     }
   }
 }

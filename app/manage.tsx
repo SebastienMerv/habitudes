@@ -32,9 +32,19 @@ export default function ManageScreen() {
     const loadHabits = async () => {
       const storedHabits = await AsyncStorage.getItem("habits");
       if (storedHabits) {
-        setHabits(JSON.parse(storedHabits));
+        const parsedHabits = JSON.parse(storedHabits);
+        const validatedHabits = parsedHabits.map((habit) => ({
+          ...habit,
+          repeat: habit.repeat || "Quotidien", // Assurer une valeur par défaut
+          details: habit.details || "", // Garantir des détails
+          time: habit.time || "", // Assurer une heure par défaut
+        }));
+        setHabits(validatedHabits);
+      } else {
+        setHabits([]);
       }
     };
+
     loadHabits();
   }, []);
 
@@ -60,8 +70,8 @@ export default function ManageScreen() {
       setNewHabit(habit.title);
       setRepeat(habit.repeat);
       setTime(habit.time);
-      setSelectedDays(habit.details?.split(", ") || []);
-      setSelectedDates(habit.details?.split(", ") || []);
+      setSelectedDays(habit.repeat === "Hebdomadaire" ? habit.details?.split(", ") || [] : []);
+      setSelectedDates(habit.repeat === "Mensuel" ? habit.details?.split(", ") || [] : []);
     }
     setVisible(true);
   };
@@ -153,17 +163,14 @@ export default function ManageScreen() {
             {editingHabit ? "Modifier l'Habitude" : "Nouvelle Habitude"}
           </Text>
           <TextInput
-            label="Nom de l'habitué"
+            label="Nom de l'habitude"
             value={newHabit}
             onChangeText={setNewHabit}
             mode="outlined"
             style={styles.input}
           />
           <Text style={styles.sectionTitle}>Répétition</Text>
-          <RadioButton.Group
-            onValueChange={(value) => setRepeat(value)}
-            value={repeat}
-          >
+          <RadioButton.Group onValueChange={(value) => setRepeat(value)} value={repeat}>
             <RadioButton.Item label="Quotidien" value="Quotidien" />
             <RadioButton.Item label="Hebdomadaire" value="Hebdomadaire" />
             <RadioButton.Item label="Mensuel" value="Mensuel" />

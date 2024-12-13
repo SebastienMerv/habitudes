@@ -26,7 +26,7 @@ export default function Layout() {
         }}
       >
         <Tabs.Screen
-          name="today"
+          name="index"
           options={{
             title: "Habitudes du Jour",
             tabBarIcon: ({ color }) => (

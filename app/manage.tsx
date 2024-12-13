@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import {
   Text,
   Button,
@@ -125,33 +125,35 @@ export default function ManageScreen() {
       <Text style={styles.subText}>Ajoutez, modifiez ou supprimez vos habitudes.</Text>
       <Divider style={styles.divider} />
 
-      {habits.map((habit) => (
-        <Card key={habit.id} style={styles.card} mode="outlined">
-          <Card.Content>
-            <Text>{habit.title}</Text>
-            <Text style={styles.repeatText}>
-              Répétition : {habit.repeat} {habit.details && `(${habit.details})`}
-            </Text>
-            <Text style={styles.timeText}>À : {habit.time}</Text>
-          </Card.Content>
-          <Card.Actions>
-            <IconButton
-              icon="pencil"
-              onPress={() => showDrawer(habit)}
-              accessibilityLabel="Modifier"
-            />
-            <IconButton
-              icon="delete"
-              onPress={() => deleteHabit(habit.id)}
-              accessibilityLabel="Supprimer"
-            />
-          </Card.Actions>
-        </Card>
-      ))}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {habits.map((habit) => (
+          <Card key={habit.id} style={styles.card} mode="outlined">
+            <Card.Content>
+              <Text>{habit.title}</Text>
+              <Text style={styles.repeatText}>
+                Répétition : {habit.repeat} {habit.details && `(${habit.details})`}
+              </Text>
+              <Text style={styles.timeText}>À : {habit.time}</Text>
+            </Card.Content>
+            <Card.Actions>
+              <IconButton
+                icon="pencil"
+                onPress={() => showDrawer(habit)}
+                accessibilityLabel="Modifier"
+              />
+              <IconButton
+                icon="delete"
+                onPress={() => deleteHabit(habit.id)}
+                accessibilityLabel="Supprimer"
+              />
+            </Card.Actions>
+          </Card>
+        ))}
 
-      <Button mode="contained" style={styles.addButton} onPress={() => showDrawer()}>
-        Ajouter une Habitude
-      </Button>
+        <Button mode="contained" style={styles.addButton} onPress={() => showDrawer()}>
+          Ajouter une Habitude
+        </Button>
+      </ScrollView>
 
       <Portal>
         <Modal
@@ -243,9 +245,10 @@ const styles = StyleSheet.create({
   headerText: { marginBottom: 8, textAlign: "center" },
   subText: { marginBottom: 16, textAlign: "center", color: "gray" },
   divider: { marginBottom: 16 },
+  scrollContainer: { paddingBottom: 16 },
   card: { marginBottom: 8, borderRadius: 8 },
   repeatText: { color: "gray", marginTop: 4 },
-  addButton: { marginTop: 16 },
+  addButton: { marginTop: 16, marginBottom: 16 },
   modal: { backgroundColor: "white", padding: 16, marginHorizontal: 32, borderRadius: 8 },
   modalTitle: { marginBottom: 16, textAlign: "center" },
   input: { marginBottom: 16 },

@@ -1,27 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { Text, Card, Checkbox, Divider } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function TodayScreen() {
   const [habits, setHabits] = useState([]);
   const [todayHabits, setTodayHabits] = useState({ uncompleted: [], completed: [] });
 
-  useEffect(() => {
-    const loadHabits = async () => {
-      const storedHabits = await AsyncStorage.getItem("habits");
-      if (storedHabits) {
-        const allHabits = JSON.parse(storedHabits);
-        filterTodayHabits(allHabits);
-        setHabits(allHabits);
-      } else {
-        setHabits([]);
-        setTodayHabits({ uncompleted: [], completed: [] });
-      }
-    };
+  // Charger les habitudes chaque fois que l'écran est focalisé
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadHabits = async () => {
+        const storedHabits = await AsyncStorage.getItem("habits");
+        if (storedHabits) {
+          const allHabits = JSON.parse(storedHabits);
+          filterTodayHabits(allHabits);
+          setHabits(allHabits);
+        } else {
+          setHabits([]);
+          setTodayHabits({ uncompleted: [], completed: [] });
+        }
+      };
 
-    loadHabits();
-  }, []);
+      loadHabits();
+    }, [])
+  );
 
   const saveHabits = async (updatedHabits) => {
     try {
@@ -81,40 +85,44 @@ export default function TodayScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      <Text variant="headlineMedium" style={styles.headerText}>
-        Habitudes du Jour
-      </Text>
-      <Divider style={styles.divider} />
-      <FlatList
-        data={todayHabits.uncompleted}
-        keyExtractor={(item) => item.id}
-        renderItem={renderHabit}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={<Text style={styles.emptyText}>Aucune habitude à faire aujourd'hui.</Text>}
-      />
-      <Divider style={styles.divider} />
-      <Text style={styles.completedHeaderText}>Habitudes terminées</Text>
-      <FlatList
-        data={todayHabits.completed}
-        keyExtractor={(item) => item.id}
-        renderItem={renderHabit}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={<Text style={styles.emptyText}>Aucune habitude terminée.</Text>}
-      />
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text variant="headlineMedium" style={styles.headerText}>
+          Habitudes du Jour
+        </Text>
+        <Divider style={styles.divider} />
+
+        {/* Liste des habitudes non terminées */}
+        <Text style={styles.sectionHeader}>À Faire</Text>
+        {todayHabits.uncompleted.length > 0 ? (
+          todayHabits.uncompleted.map((habit) => renderHabit({ item: habit }))
+        ) : (
+          <Text style={styles.emptyText}>Aucune habitude à faire aujourd'hui.</Text>
+        )}
+
+        <Divider style={styles.divider} />
+
+        {/* Liste des habitudes terminées */}
+        <Text style={styles.sectionHeader}>Terminées</Text>
+        {todayHabits.completed.length > 0 ? (
+          todayHabits.completed.map((habit) => renderHabit({ item: habit }))
+        ) : (
+          <Text style={styles.emptyText}>Aucune habitude terminée.</Text>
+        )}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: "#f5f5f5" },
+  scrollContainer: { flexGrow: 1 },
   headerText: { marginBottom: 8, textAlign: "center" },
   divider: { marginVertical: 16 },
-  listContainer: { paddingBottom: 16 },
+  sectionHeader: { fontSize: 18, fontWeight: "bold", marginBottom: 8 },
   card: { marginBottom: 8, borderRadius: 8 },
   cardContent: { flexDirection: "row", alignItems: "center" },
   habitText: { fontSize: 16, marginLeft: 8, flex: 1 },
   completedText: { textDecorationLine: "line-through", color: "gray" },
   emptyText: { textAlign: "center", color: "gray", marginTop: 32 },
-  completedHeaderText: { textAlign: "center", color: "gray", fontWeight: "bold", marginBottom: 8 },
 });
